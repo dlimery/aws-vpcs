@@ -14,13 +14,13 @@ res_vpcid=$(aws ec2 describe-vpcs \
 
 if [ ${res_vpcid} = "null" ]
 then
-	echo -e "\n${RED}[${NC}WARNING!${RED}] ${NC}No VPC to delete !!!\n"
+	echo -e "\n${RED}[${NC}WARNING!${RED}] ${NC}No VPC to delete !!!"
 else
 	# Starting the deletion process
-	echo -e "\nStarting deletion of VPC with ${CYAN}VpcID = ${res_vpcid}\n"
+	echo -e "\nStarting deletion of VPC ${CYAN}'${res_vpcid}'"
 	aws ec2 delete-vpc --vpc-id ${res_vpcid}
 	# Print out successful deletion
-	echo -e "\n[${GREEN}OK${NC}] VPC with ${CYAN}VpcID = ${res_vpcid} ${NC}deleted!"
+	echo -e "\n${NC}[${GREEN}OK${NC}] VPC ${CYAN}'${res_vpcid}' ${NC}deleted!"
 fi
 
 
