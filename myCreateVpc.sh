@@ -49,19 +49,9 @@ function cleanUp() {
   fi
 }
 
-function syntax_usage () {
-  echo -e "\nUsage:"
-  echo -e "  ${CYAN}${__base} ${NC}<${YELLOW}vpc_cidr_block${NC}>\n"
-  echo -e "Tips:"
-  echo -e "  <${YELLOW}vpc_cidr_block${NC}> : " \
-    "MUST have the following IPv4 CIDR format: ${YELLOW}A.B.C.D/16${NC}\n"
-  echo -e "Example:"
-  echo -e "  ${CYAN}${__base} ${YELLOW}172.22.0.0/16"
-}
-
 function validate_vpc_cidr_block() {
   local ip=${1}
-  local  result=1
+  local result=1
 
   testformat=^[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\/16$
   if [[ "${ip}" =~ ${testformat} ]]; then
@@ -74,6 +64,75 @@ function validate_vpc_cidr_block() {
     result=$?
   fi
   return ${result}
+}
+
+#TODO: move main if statements into syntax_usage() 
+function syntax_usage() {
+  local result="0"
+  # Command syntax validation
+  echo -e "nb d'args local = ${1}"                                          
+  if [[ "${2}" -eq  "0" ]]; then                                         
+#    echo -e "\n${NC}[${RED}SYNTAX ERROR${NC}]" \                       
+#      "No arguments supplied\n"                                        
+    result="1"
+    #exit 1
+  else
+    if [[ "${2}" -gt "1" ]]; then                                          
+#    echo -e "\n${NC}[${RED}SYNTAX ERROR${NC}]" \                       
+#     "Too many arguments!\n"                                           
+      result="2"
+    #exit 2
+
+    # Address IP validation                                              
+    else
+      if validate_vpc_cidr_block ${1}; then                                  
+        result="10"                                                     
+#    echo -e "\n[${GREEN}OK${NC}]" \                                    
+#      "${CYAN}${1} ${NC}is a valid /16 CIDR Block\n"                   
+      else
+        result="3"                                                       
+#    syntax_usage                                                       
+#    echo -e "\n${NC}[${RED}SYNTAX ERROR${NC}]" \                       
+#     "${CYAN}${1} ${NC}is not compliant to IPv4 format:" \             
+#     "${CYAN}A.B.C.D/16${NC}\n"                                        
+      fi
+    fi
+  fi
+
+  echo -e "\nUsage:"
+  echo -e "  ${CYAN}${__base} ${NC}<${YELLOW}vpc_cidr_block${NC}>\n"
+  echo -e "Tips:"
+  echo -e "  <${YELLOW}vpc_cidr_block${NC}> : " \
+    "MUST have the following IPv4 CIDR format: ${YELLOW}A.B.C.D/16${NC}\n"
+  echo -e "Example:"
+  echo -e "  ${CYAN}${__base} ${YELLOW}172.22.0.0/16"
+
+  echo -e "Result = ${result}"
+  case ${result} in
+    "1")
+      echo -e "\n${NC}[${RED}SYNTAX ERROR${NC}]" \
+        "No arguments supplied\n"
+      exit 1                                        
+      ;;
+    "2")
+      echo -e "\n${NC}[${RED}SYNTAX ERROR${NC}]" \
+        "Too many arguments!\n"
+      exit 2                                           
+      ;;
+    "3")
+      echo -e "\n${NC}[${RED}SYNTAX ERROR${NC}]" \
+        "${CYAN}${1} ${NC}is not compliant to IPv4 format:" \
+        "${CYAN}A.B.C.D/16${NC}\n"
+      exit 3
+      ;;     
+    "10")
+      echo -e "\n[${GREEN}OK${NC}]" \
+        "${CYAN}${1} ${NC}is a valid /16 CIDR Block\n"
+      ;;                   
+    *)
+      error "Unexpected expression"
+    ;;
+  esac
 }
 
 # Pause
@@ -103,8 +162,14 @@ function main() {
   trap cleanUp EXIT
   mkdir "$SCRATCH"
 
+#TODO: add test for $# equal to 0
   # Command syntax validation
-  if [[ "$#" -eq  "0" ]]; then
+  echo -e "all args = $@"
+  echo -e "nb d'args = $# before"
+ # echo -e "display arg1 = ${1}"                                          
+  syntax_usage $@ $#
+<<'END'  
+if [[ "$#" -eq  "0" ]]; then
     syntax_usage
     echo -e "\n${NC}[${RED}SYNTAX ERROR${NC}]" \
       "No arguments supplied\n"
@@ -130,7 +195,7 @@ function main() {
      "${CYAN}${1} ${NC}is not compliant to IPv4 format:" \
      "${CYAN}A.B.C.D/16${NC}\n"
   fi
-
+END
   #echo -e "$1: " "${result}"
 
 # name the vpc
