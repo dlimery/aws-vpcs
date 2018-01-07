@@ -46,7 +46,7 @@ function my_pause() {
 
 function validate_vpc_cidr_block() {
   local ip=${1}
-  local result=1
+  local return_code=1
 
   testformat=^[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\/16$
   if [[ "${ip}" =~ ${testformat} ]]; then
@@ -56,12 +56,13 @@ function validate_vpc_cidr_block() {
     IFS=$OIFS
     [[ ${ip[0]} -le 255 && ${ip[1]} -le 255 \
       && ${ip[2]} -eq 0 && ${ip[3]} -eq 0 ]]
-    result=$?
+    return_code=$?
   fi
-  return ${result}
+  return ${return_code}
 }
 
 function display_usage() {
+  local return_code=0
   echo -e "\nUsage:"
   echo -e "  ${CYAN}${__base} ${NC}<${YELLOW}vpc_cidr_block${NC}>\n"
   echo -e "Tips:"
@@ -70,24 +71,25 @@ function display_usage() {
        "${YELLOW}A.B.${NC}0${YELLOW}.${NC}0${YELLOW}/16${NC}\n"
   echo -e "Example:"
   echo -e "  ${CYAN}${__base} ${YELLOW}172.22.0.0/16${NC}\n"
+  return ${return_code}
 }
 
 
-function syntax_usage() {
-  local result="0"
+function syntax_status() {
+  local return_code=1
   if [[ "${1}" -gt "1" ]]; then                                          
-    result="2"
+    return_code=2
     echo -e "\n${NC}[${RED}SYNTAX ERROR${NC}]" \
         "Too many arguments!\n"
     display_usage
     exit 2                                           
   else
     if validate_vpc_cidr_block ${2}; then                                  
-      result="10"                                                     
+      return_code=0
       echo -e "\n[${GREEN}OK${NC}]" \
         "${CYAN}${2} ${NC}is a valid /16 CIDR Block\n"                   
-    else
-      result="3"                                                       
+   else
+      return_code=3                                                       
       echo -e "\n${NC}[${RED}SYNTAX ERROR${NC}]" \
         "${CYAN}${2} ${NC}is not compliant to IPv4 format:" \
         "${CYAN}A.B.0.0/16${NC}\n"
@@ -95,16 +97,18 @@ function syntax_usage() {
       exit 3
     fi
   fi
-  return ${result}
+  return ${return_code}
 }
 
 function aws_create_vpc() {
+  local aws_vpc_cidr_block = ${1}
+
   # Starting the creation process
   echo -e "\nCreating VPC..."
 
   # create vpc
   cmd_output=$(aws ec2 create-vpc \
-    --cidr-block "$aws_vpc_cidr_block" \
+    --cidr-block "${aws_vpc_cidr_block}" \
     --output json)
   VpcId=$(echo -e "${cmd_output}" | /usr/bin/jq '.Vpc.VpcId' | tr -d '"')
 
@@ -121,10 +125,15 @@ function main() {
    echo -e "\n${NC}[${RED}SYNTAX ERROR${NC}]" \
       "No arguments supplied\n"                                        
    display_usage
-     exit 1
+   exit 1
   fi
-  syntax_usage $# $@
-
+  if syntax_status $# $@; then
+    aws_vpc_cidr_block=$@
+  else
+    exit 99
+  fi
+  
+  #aws_create_vpc
 
 # name the vpc
 # aws ec2 create-tags \
