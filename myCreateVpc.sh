@@ -28,7 +28,6 @@ aws_subnet_name="$name Subnet"
 aws_instance_gateway_name="$name Gateway"
 aws_route_table_name="$name Route Table"
 aws_security_group_name="$name Security Group"
-aws_vpc_cidr_block="172.22.0.0/16"
 aws_subnet_cidr_block="172.22.1.0/24"
 
 # constants for colored output
@@ -74,7 +73,7 @@ function display_usage() {
   echo -e "DESCRIPTION:\n"
   echo -e "    myCreateVpc is a tool for creating AWS Virtual Private Cloud"
   echo -e "    (VPC) instances. Virtual Private Cloud is a virtual network"
-  echo -e "    dedicated to your AWS account. It is logically isolated from"
+  echo -e "    dedicated to an AWS account. It is logically isolated from"
   echo -e "    other virtual networks in the AWS Cloud. AWS resources can be"
   echo -e "    launched into VPCs, such as Amazon EC2 instances."
   echo -e "    myCreateVpc is a bash script which leverages AWS CLI commands."
