@@ -42,8 +42,10 @@ mkdir "$SCRATCH"
 
 # Actual work here, all temp files created under $SCRATCH.
 
+aws_vpc_cidr_block=${1}
+
 aws ec2 describe-vpcs \
-    --filter Name=cidr,Values="172.22.0.0/16" \
+    --filter Name=cidr,Values=${aws_vpc_cidr_block} \
   | jq '.Vpcs[0].VpcId' \
   | tr -d '"'
 

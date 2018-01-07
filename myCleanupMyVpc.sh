@@ -59,8 +59,10 @@ readonly RED='\033[0;31m'
 readonly GREEN='\033[0;32m'                                           
 readonly CYAN='\033[0;36m'                                            
 
+aws_vpc_cidr_block=${1}
+
 res_vpcid=$(aws ec2 describe-vpcs \
-    --filter Name=cidr,Values="172.22.0.0/16" \
+    --filter Name=cidr,Values=${aws_vpc_cidr_block} \
   | jq '.Vpcs[0].VpcId' \
   | tr -d '"')
 

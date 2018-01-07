@@ -19,7 +19,8 @@ __root="$(cd "$(dirname "${__dir}")" && pwd)"
 
 arg1="${1:-}"
 
-aws ec2 describe-vpcs --filter Name=cidr,Values="172.22.0.0/16"
+aws_vpc_cidr_block=${1}
+aws ec2 describe-vpcs --filter Name=cidr,Values=${aws_vpc_cidr_block}
 
 # Defines a working area on the file system.
 SCRATCH=/tmp/$$.scratch

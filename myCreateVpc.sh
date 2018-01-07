@@ -122,10 +122,10 @@ function syntax_status() {
 }
 
 function aws_create_vpc() {
-  local aws_vpc_cidr_block = ${1}
+  local aws_vpc_cidr_block=${1}
 
   # Starting the creation process
-  echo -e "\nCreating VPC..."
+  echo -e "Creating VPC..."
 
   # create vpc
   cmd_output=$(aws ec2 create-vpc \
@@ -154,7 +154,7 @@ function main() {
     exit 99
   fi
   
-  #aws_create_vpc
+  aws_create_vpc ${aws_vpc_cidr_block}
 
 # name the vpc
 # aws ec2 create-tags \
