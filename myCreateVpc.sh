@@ -1,5 +1,6 @@
 #!/bin/bash
 #
+# Script filename = "myCreate.sh"
 # Create AWS Virtual Private Cloud (VPCs)
 
 # Sourced from http://www.alittlemadness.com/category/bash/
@@ -124,7 +125,7 @@ function aws_create_vpc() {
   local aws_vpc_cidr_block=${1}
 
   # Starting the creation process
-  echo -e "Creating VPC..."
+  echo -e "\nCreating VPC..."
 
   # create vpc
   cmd_output=$(aws ec2 create-vpc \
