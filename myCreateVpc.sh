@@ -37,6 +37,8 @@ readonly RED='\033[0;31m'
 readonly GREEN='\033[0;32m'
 readonly YELLOW='\033[0;33m'
 readonly CYAN='\033[0;36m'
+readonly GREY='\033[0;90m'
+
 
 ### Functions
 
@@ -63,14 +65,26 @@ function validate_vpc_cidr_block() {
 
 function display_usage() {
   local return_code=0
-  echo -e "\nUsage:"
-  echo -e "  ${CYAN}${__base} ${NC}<${YELLOW}vpc_cidr_block${NC}>\n"
-  echo -e "Tips:"
-  echo -e "  <${YELLOW}vpc_cidr_block${NC}> " \
-    "MUST have the following IPv4 CIDR format: " \
+
+  echo -e "\t~\t~\t~\t~\t~\t~\t~"
+  echo -e "\n${GREEN}myCreateVpc" \
+    "${NC}- bash script to create AWS VPCs -" \
+    "${GREY}[pre-release-0.0.1]${NC}\n"
+  echo -e "USAGE: ${CYAN}${__base} ${NC}<${YELLOW}vpc_cidr_block${NC}>\n"
+  echo -e "DESCRIPTION:\n"
+  echo -e "    myCreateVpc is a tool for creating AWS Virtual Private Cloud"
+  echo -e "    (VPC) instances. Virtual Private Cloud is a virtual network"
+  echo -e "    dedicated to your AWS account. It is logically isolated from"
+  echo -e "    other virtual networks in the AWS Cloud. AWS resources can be"
+  echo -e "    launched into VPCs, such as Amazon EC2 instances."
+  echo -e "    myCreateVpc is a bash script which leverages AWS CLI commands."
+  echo -e "    It accepts only one argument: an IPv4 CIDR block in /16\n"
+  echo -e "    For more details see https://github.com/dlimery/aws-vpcs\n"
+  echo -e "TIP:\n"
+  echo -e "  <${YELLOW}vpc_cidr_block${NC}>" \
+    "MUST have the following IPv4 CIDR format:" \
        "${YELLOW}A.B.${NC}0${YELLOW}.${NC}0${YELLOW}/16${NC}\n"
-  echo -e "Example:"
-  echo -e "  ${CYAN}${__base} ${YELLOW}172.22.0.0/16${NC}\n"
+  echo -e "\texample: ${CYAN}${__base} ${YELLOW}172.22.0.0/16${NC}\n"
   return ${return_code}
 }
 
@@ -79,6 +93,7 @@ function syntax_status() {
   local return_code=1
   if [[ "${1}" -gt "1" ]]; then                                          
     return_code=2
+    echo -e "\nOUTPUT:"
     echo -e "\n${NC}[${RED}SYNTAX ERROR${NC}]" \
         "Too many arguments!\n"
     display_usage
@@ -86,10 +101,16 @@ function syntax_status() {
   else
     if validate_vpc_cidr_block ${2}; then                                  
       return_code=0
+      echo -e "\n${CYAN}myCreateVpc" \
+        "${NC}- bash script to create AWS VPCs -" \
+        "${GREY}[pre-release-0.0.1]${NC}\n"
+      echo -e "\t~\t~\t~\t~\t~\t~\t~"
+      echo -e "\nOUTPUT:"
       echo -e "\n[${GREEN}OK${NC}]" \
         "${CYAN}${2} ${NC}is a valid /16 CIDR Block\n"                   
-   else
+    else
       return_code=3                                                       
+      echo -e "\nOUTPUT:"
       echo -e "\n${NC}[${RED}SYNTAX ERROR${NC}]" \
         "${CYAN}${2} ${NC}is not compliant to IPv4 format:" \
         "${CYAN}A.B.0.0/16${NC}\n"
