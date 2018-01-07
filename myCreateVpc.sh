@@ -35,6 +35,7 @@ aws_subnet_cidr_block="172.22.1.0/24"
 readonly NC='\033[0m' # No Color
 readonly RED='\033[0;31m'
 readonly GREEN='\033[0;32m'
+readonly YELLOW='\033[0;33m'
 readonly CYAN='\033[0;36m'
 
 # Defines a working area on the file system.
@@ -45,17 +46,25 @@ SCRATCH=/tmp/$$.scratch
 function cleanUp() {
   if [[ -d "$SCRATCH" ]]; then
     rm -r "$SCRATCH"
-  else
-    echo -e "-d "$SCRATCH" is false"
   fi
 }
 
+function syntax_usage () {
+  echo -e "\nUsage:"
+  echo -e "  ${CYAN}${__base} ${NC}<${YELLOW}vpc_cidr_block${NC}>\n"
+  echo -e "Tips:"
+  echo -e "  <${YELLOW}vpc_cidr_block${NC}> : " \
+    "MUST have the following IPv4 CIDR format: ${YELLOW}A.B.C.D/16${NC}\n"
+  echo -e "Example:"
+  echo -e "  ${CYAN}${__base} ${YELLOW}172.22.0.0/16"
+}
 
 function validate_vpc_cidr_block() {
   local ip=${1}
   local  result=1
 
-  if [[ "${ip}" =~ ^[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\/16$ ]]; then
+  testformat=^[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\/16$
+  if [[ "${ip}" =~ ${testformat} ]]; then
     OIFS=$IFS
     IFS="./"
     ip=($ip)
@@ -68,7 +77,7 @@ function validate_vpc_cidr_block() {
 }
 
 # Pause
-function myPause() {
+function my_pause() {
   read -p "Press enter to continue"
 }
 
@@ -96,23 +105,33 @@ function main() {
 
   # Command syntax validation
   if [[ "$#" -eq  "0" ]]; then
-    echo "No arguments supplied"
+    syntax_usage
+    echo -e "\n${NC}[${RED}SYNTAX ERROR${NC}]" \
+      "No arguments supplied\n"
     exit 1
-  else
-    echo "The Arg1 is: $1"
   fi
-
-  # Command arguments
-  echo -e "VPC CIDR Block is: $1"
+  
+  if [[ "$#" -gt "1" ]]; then
+    syntax_usage
+    echo -e "\n${NC}[${RED}SYNTAX ERROR${NC}]" \
+     "Too many arguments!\n"
+    exit 2
+  fi
 
   # Address IP validation
   if validate_vpc_cidr_block $1; then
     result='good';
+    echo -e "\n[${GREEN}OK${NC}]" \
+      "${CYAN}${1} ${NC}is a valid /16 CIDR Block\n"
   else
     result='bad'
+    syntax_usage
+    echo -e "\n${NC}[${RED}SYNTAX ERROR${NC}]" \
+     "${CYAN}${1} ${NC}is not compliant to IPv4 format:" \
+     "${CYAN}A.B.C.D/16${NC}\n"
   fi
 
-  echo -e "$1: " "${result}"
+  #echo -e "$1: " "${result}"
 
 # name the vpc
 # aws ec2 create-tags \
@@ -120,7 +139,7 @@ function main() {
 #   --tags Key=Name,Value="$aws_vpc_name"
 
 
-  echo -e "\n"
+  #echo -e "\n"
 
 
   # Sourced from http://www.alittlemadness.com/category/bash/
