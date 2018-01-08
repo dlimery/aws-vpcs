@@ -122,6 +122,7 @@ function syntax_status() {
 }
 
 function aws_create_vpc() {
+  local __new_vpc_id=${2}
   local aws_vpc_cidr_block=${1}
 
   # Starting the creation process
@@ -131,15 +132,22 @@ function aws_create_vpc() {
   cmd_output=$(aws ec2 create-vpc \
     --cidr-block "${aws_vpc_cidr_block}" \
     --output json)
-  VpcId=$(echo -e "${cmd_output}" | /usr/bin/jq '.Vpc.VpcId' | tr -d '"')
+  vpc_id=$(echo -e "${cmd_output}" | /usr/bin/jq '.Vpc.VpcId' | tr -d '"')
+  
+  eval $__new_vpc_id="'${vpc_id}'"
 
   # show result
-  echo -e "\n[${GREEN}OK${NC}] VPC ${CYAN}'${VpcId}' ${NC}created.\n"
+  echo -e "\n[${GREEN}OK${NC}] VPC ${CYAN}'${vpc_id}' ${NC}created.\n"
 }
 
+function () {
 
+
+}
 
 function main() {
+
+  local new_vpc_id=null
 
   # Arguments validation tests
   if [[ "$#" -eq  "0" ]]; then
@@ -154,16 +162,15 @@ function main() {
     exit 99
   fi
 
-  #new_vpc="$(aws_create_vpc ${aws_vpc_cidr_block} --output json)"
-  aws_create_vpc ${aws_vpc_cidr_block} --output json
+  aws_create_vpc ${aws_vpc_cidr_block} new_vpc_id
   
   # Name the Vpc
-  echo -e "${new_vpc}"
+  echo -e "${new_vpc_id}"
   #echo -e "aws_vpc_id = $aws_vpc_id"
 
-  # aws ec2 create-tags \
-  #  --resources "$aws_vpc_id" \
-  #  --tags Key=Name,Value="$aws_vpc_name"
+  aws ec2 create-tags \
+    --resources "$new_vpc_id" \
+    --tags Key=Name,Value="$new_vpc_id"
 
   echo -e "\n"
 }
