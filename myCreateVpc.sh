@@ -166,13 +166,9 @@ function main() {
   fi
 
   aws_ec2_create_vpc ${aws_vpc_cidr_block} new_vpc_id
-  
-  # Name the Vpc
-  echo -e "new_vpc_id = ${new_vpc_id}"
 
   aws_ec2_create_tag ${new_vpc_id}
 
-  echo -e "\n"
 }
 
 main "$@"
