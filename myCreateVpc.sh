@@ -156,10 +156,12 @@ function main() {
 
   aws_create_vpc ${aws_vpc_cidr_block}
 
-# name the vpc
-# aws ec2 create-tags \
-#   --resources "$VpcId" \
-#   --tags Key=Name,Value="$aws_vpc_name"
+  # Name the Vpc
+  echo -e "aws_vpc_id = $aws_vpc_id"
+
+  # aws ec2 create-tags \
+    --resources "$aws_vpc_id" \
+    --tags Key=Name,Value="$aws_vpc_name"
 
 }
 
