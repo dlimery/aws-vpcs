@@ -89,6 +89,7 @@ function display_usage() {
 
 function syntax_status() {
   local return_code=1
+
   if [[ "${1}" -gt "1" ]]; then
     return_code=2
     echo -e "\nOUTPUT:"
@@ -120,6 +121,7 @@ function syntax_status() {
 }
 
 function aws_delete_vpc() {
+#TODO: initialize res_vpcid and rename it / 08-JAN-2017 19:54 CET
   res_vpcid=$(aws ec2 describe-vpcs \
       --filter Name=cidr,Values=${aws_vpc_cidr_block} \
     | jq '.Vpcs[0].VpcId' \

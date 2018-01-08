@@ -90,6 +90,7 @@ function display_usage() {
 
 function syntax_status() {
   local return_code=1
+
   if [[ "${1}" -gt "1" ]]; then
     return_code=2
     echo -e "\nOUTPUT:"
@@ -123,23 +124,28 @@ function syntax_status() {
 function main() {
 
   # Arguments validation tests
-  if [[ "$#" -eq  "0" ]]; then
-    aws ec2 describe-vpcs
-    exit 0
-  fi
-  if syntax_status $# $@; then
-    aws_vpc_cidr_block=$@
-  else
-    exit 99
-  fi
+#  if [[ "$#" -eq  "0" ]]; then
+#    aws ec2 describe-vpcs
+#    exit 0
+#  fi
+#  if syntax_status $# $@; then
+#    aws_vpc_cidr_block=$@
+#  else
+#    exit 99
+#  fi
 
-  aws_vpc_cidr_block=${1}
+#  aws_vpc_cidr_block=${1}
 
-  aws ec2 describe-vpcs \
-      --filter Name=cidr,Values=${aws_vpc_cidr_block} \
-    | jq '.Vpcs[0].VpcId' \
-    | tr -d '"'
+#  aws ec2 describe-vpcs --output json \
+#      --filter Name=cidr,Values=${aws_vpc_cidr_block} \
+#    | jq '.Vpcs[0].VpcId' \
+#    | tr -d '"'
+
+  vpc_id=$(aws ec2 describe-vpcs --output json \
+    | jq -c '.Vpcs[0].VpcId' \
+    | tr -d '"')
+
+  echo "vpc_id = ${vpc_id}"
 }
-
 
 main "$@"
