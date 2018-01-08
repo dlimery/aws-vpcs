@@ -121,7 +121,7 @@ function syntax_status() {
   return ${return_code}
 }
 
-function aws_create_vpc() {
+function aws_ec2_create_vpc() {
   local __new_vpc_id=${2}
   local aws_vpc_cidr_block=${1}
 
@@ -140,9 +140,12 @@ function aws_create_vpc() {
   echo -e "\n[${GREEN}OK${NC}] VPC ${CYAN}'${vpc_id}' ${NC}created.\n"
 }
 
-function () {
+function aws_ec2_create_tag() {
+  local new_vpc_id=$1
 
-
+  aws ec2 create-tags \
+    --resources "$new_vpc_id" \
+    --tags Key=Name,Value="$new_vpc_id"
 }
 
 function main() {
@@ -162,15 +165,12 @@ function main() {
     exit 99
   fi
 
-  aws_create_vpc ${aws_vpc_cidr_block} new_vpc_id
+  aws_ec2_create_vpc ${aws_vpc_cidr_block} new_vpc_id
   
   # Name the Vpc
-  echo -e "${new_vpc_id}"
-  #echo -e "aws_vpc_id = $aws_vpc_id"
+  echo -e "new_vpc_id = ${new_vpc_id}"
 
-  aws ec2 create-tags \
-    --resources "$new_vpc_id" \
-    --tags Key=Name,Value="$new_vpc_id"
+  aws_ec2_create_tag ${new_vpc_id}
 
   echo -e "\n"
 }

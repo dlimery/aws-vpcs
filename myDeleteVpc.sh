@@ -129,7 +129,7 @@ function aws_delete_vpc() {
     echo -e "${RED}[${NC}WARNING!${RED}] ${NC}No VPC to delete !!!\n"
   else
     # Starting the deletion process
-    echo -e "\nStarting deletion of VPC ${CYAN}'${res_vpcid}'"
+    echo -e "\nStarting deletion of VPC ${CYAN}'${res_vpcid}'${NC}"
     aws ec2 delete-vpc --vpc-id ${res_vpcid}
     # Print out successful deletion
     echo -e "\n${NC}[${GREEN}OK${NC}] VPC ${CYAN}'${res_vpcid}' ${NC}deleted!\n"
