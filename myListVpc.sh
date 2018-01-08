@@ -1,6 +1,6 @@
 #!/bin/bash
 #
-# Script filename = "myCreateVpc.sh"
+# Script filename = "myListVpc.sh"
 # Create AWS Virtual Private Cloud (VPCs)
 
 # Sourced from http://www.alittlemadness.com/category/bash/
@@ -67,17 +67,17 @@ function display_usage() {
   local return_code=0
 
   echo -e "\t~\t~\t~\t~\t~\t~\t~"
-  echo -e "\n${GREEN}myCreateVpc" \
-    "${NC}- bash script to create AWS VPCs -" \
+  echo -e "\n${GREEN}myListVpc" \
+    "${NC}- bash script to List AWS VPCs -" \
     "${GREY}[pre-release-0.0.1]${NC}\n"
   echo -e "USAGE: ${CYAN}${__base} ${NC}<${YELLOW}vpc_cidr_block${NC}>\n"
   echo -e "DESCRIPTION:\n"
-  echo -e "    myCreateVpc is a tool for creating AWS Virtual Private Cloud"
+  echo -e "    myListVpc is a tool for listing AWS Virtual Private Cloud"
   echo -e "    (VPC) instances. Virtual Private Cloud is a virtual network"
   echo -e "    dedicated to an AWS account. It is logically isolated from"
   echo -e "    other virtual networks in the AWS Cloud. AWS resources can be"
   echo -e "    launched into VPCs, such as Amazon EC2 instances."
-  echo -e "    myCreateVpc is a bash script which leverages AWS CLI commands."
+  echo -e "    myListVpc is a bash script which leverages AWS CLI commands."
   echo -e "    It accepts only one argument: an IPv4 CIDR block in /16\n"
   echo -e "    For more details see https://github.com/dlimery/aws-vpcs\n"
   echo -e "TIP:\n"
@@ -87,7 +87,6 @@ function display_usage() {
   echo -e "\texample: ${CYAN}${__base} ${YELLOW}172.22.0.0/16${NC}\n"
   return ${return_code}
 }
-
 
 function syntax_status() {
   local return_code=1
@@ -121,24 +120,6 @@ function syntax_status() {
   return ${return_code}
 }
 
-function aws_create_vpc() {
-  local aws_vpc_cidr_block=${1}
-
-  # Starting the creation process
-  echo -e "\nCreating VPC..."
-
-  # create vpc
-  cmd_output=$(aws ec2 create-vpc \
-    --cidr-block "${aws_vpc_cidr_block}" \
-    --output json)
-  VpcId=$(echo -e "${cmd_output}" | /usr/bin/jq '.Vpc.VpcId' | tr -d '"')
-
-  # show result
-  echo -e "\n[${GREEN}OK${NC}] VPC ${CYAN}'${VpcId}' ${NC}created."
-}
-
-
-
 function main() {
 
   # Arguments validation tests
@@ -154,13 +135,13 @@ function main() {
     exit 99
   fi
 
-  aws_create_vpc ${aws_vpc_cidr_block}
+  aws_vpc_cidr_block=${1}
 
-# name the vpc
-# aws ec2 create-tags \
-#   --resources "$VpcId" \
-#   --tags Key=Name,Value="$aws_vpc_name"
-
+  aws ec2 describe-vpcs \
+      --filter Name=cidr,Values=${aws_vpc_cidr_block} \
+    | jq '.Vpcs[0].VpcId' \
+    | tr -d '"'
 }
+
 
 main "$@"
