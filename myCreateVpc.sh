@@ -154,15 +154,18 @@ function main() {
     exit 99
   fi
 
-  aws_create_vpc ${aws_vpc_cidr_block}
-
+  #new_vpc="$(aws_create_vpc ${aws_vpc_cidr_block} --output json)"
+  aws_create_vpc ${aws_vpc_cidr_block} --output json
+  
   # Name the Vpc
-  echo -e "aws_vpc_id = $aws_vpc_id"
+  echo -e "${new_vpc}"
+  #echo -e "aws_vpc_id = $aws_vpc_id"
 
   # aws ec2 create-tags \
-    --resources "$aws_vpc_id" \
-    --tags Key=Name,Value="$aws_vpc_name"
+  #  --resources "$aws_vpc_id" \
+  #  --tags Key=Name,Value="$aws_vpc_name"
 
+  echo -e "\n"
 }
 
 main "$@"
