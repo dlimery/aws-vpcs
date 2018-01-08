@@ -124,10 +124,8 @@ function main() {
 
   # Arguments validation tests
   if [[ "$#" -eq  "0" ]]; then
-   echo -e "\n${NC}[${RED}SYNTAX ERROR${NC}]" \
-      "No arguments supplied\n"
-   display_usage
-   exit 1
+    aws ec2 describe-vpcs
+    exit 0
   fi
   if syntax_status $# $@; then
     aws_vpc_cidr_block=$@
